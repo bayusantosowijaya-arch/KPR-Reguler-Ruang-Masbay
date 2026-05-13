@@ -1,178 +1,105 @@
+import streamlit as st
+import streamlit.components.v1 as components
+
+# Konfigurasi dasar Streamlit agar tampilan penuh (Wide Mode)
+st.set_page_config(
+    page_title="Elite KPR Simulator",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# Menghilangkan padding bawaan Streamlit agar tampilan HTML kita bersih
+st.markdown("""
+    <style>
+        .block-container { padding-top: 0rem; padding-bottom: 0rem; padding-left: 0rem; padding-right: 0rem; }
+        iframe { border: none; }
+    </style>
+""", unsafe_allow_html=True)
+
+# Variabel berisi kode HTML/JS Mewah yang tadi
+html_content = """
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
-    <title>Summarecon Emerald Karawang | KPR Premium Simulator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #fcfcfc; }
-        .business-font { font-family: 'Inter', sans-serif; font-weight: 600; }
+        body { font-family: 'Inter', sans-serif; background: #fcfcfc; margin: 0; }
         .luxury-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
-        .gold-accent { color: #c5a059; }
-        .bg-gold { background-color: #c5a059; }
-        
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .input-premium { width: 100%; border-bottom: 2px solid #e2e8f0; padding: 8px 0; font-size: 1.125rem; font-weight: 600; transition: all 0.3s; background: transparent; outline: none; }
+        .input-premium:focus { border-color: #0f172a; }
         .card-shadow { box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05); }
-        
-        #main-app { animation: fadeIn 0.6s ease-out; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .input-group label { display: block; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; margin-bottom: 4px; }
-        .input-premium { width: 100%; border-bottom: 2px solid #e2e8f0; padding: 8px 0; font-size: 1.125rem; font-weight: 600; transition: all 0.3s; background: transparent; }
-        .input-premium:focus { outline: none; border-color: #0f172a; }
     </style>
 </head>
-<body class="text-slate-900">
-
-    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center luxury-gradient p-6">
-        <div class="w-full max-w-md bg-white rounded-3xl p-10 shadow-2xl text-center">
-            <div class="mb-8">
-                <h1 class="text-2xl font-serif font-bold tracking-tight text-slate-900">PRIVATE ACCESS</h1>
-                <p class="text-sm text-slate-500 mt-2">Summarecon Emerald Karawang Portfolio</p>
-            </div>
-            <div class="space-y-4">
-                <input type="password" id="passInput" placeholder="Enter Security Code" 
-                    class="w-full p-4 rounded-xl border border-slate-200 text-center text-lg focus:ring-2 focus:ring-slate-900 focus:outline-none">
-                <button onclick="checkAuth()" 
-                    class="w-full luxury-gradient text-white py-4 rounded-xl font-bold tracking-widest hover:opacity-90 transition transform active:scale-95">
-                    UNLOCK SYSTEM
-                </button>
-            </div>
-            <p id="errorMsg" class="text-red-500 mt-4 text-xs font-bold hidden">ACCESS DENIED. PLEASE CHECK YOUR CODE.</p>
+<body>
+    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center luxury-gradient">
+        <div class="w-full max-w-md bg-white rounded-3xl p-10 text-center shadow-2xl mx-4">
+            <h1 class="text-2xl font-serif font-bold text-slate-900">PRIVATE ACCESS</h1>
+            <p class="text-sm text-slate-500 mb-8 mt-2">Summarecon Emerald Karawang</p>
+            <input type="password" id="passInput" placeholder="Security Code" class="w-full p-4 rounded-xl border mb-4 text-center text-lg">
+            <button onclick="checkAuth()" class="w-full luxury-gradient text-white py-4 rounded-xl font-bold tracking-widest">UNLOCK SYSTEM</button>
+            <p id="errorMsg" class="text-red-500 mt-4 text-xs font-bold hidden">WRONG PASSWORD</p>
         </div>
     </div>
 
-    <div id="main-app" class="hidden min-h-screen pb-20">
-        <nav class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b px-6 py-4 flex justify-between items-center">
-            <div>
-                <span class="text-lg font-bold tracking-tighter uppercase">Summarecon <span class="font-light text-slate-400 italic">Emerald</span></span>
-            </div>
-            <div class="text-[10px] bg-slate-100 px-3 py-1 rounded-full font-mono font-bold text-slate-500">
-                STATION: RuangMasbay2026
-            </div>
+    <div id="main-app" class="hidden min-h-screen">
+        <nav class="bg-white border-b px-6 py-4 flex justify-between items-center sticky top-0 z-40">
+            <span class="font-bold uppercase tracking-tighter text-lg">Elite <span class="font-light text-slate-400">KPR</span></span>
+            <span class="text-[10px] bg-slate-100 px-3 py-1 rounded-full text-slate-500 font-bold uppercase">RuangMasbay2026</span>
         </nav>
 
-        <div class="max-w-6xl mx-auto px-6 mt-10">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                
-                <div class="lg:col-span-5 space-y-8">
-                    <section class="bg-white p-8 rounded-3xl card-shadow">
-                        <h2 class="text-sm font-bold uppercase tracking-widest text-slate-400 mb-8 border-b pb-4">Simulasi KPR Reguler</h2>
-                        
+        <div class="max-w-6xl mx-auto p-6 space-y-8 mt-4">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="bg-white p-8 rounded-3xl card-shadow">
+                        <h2 class="text-xs font-bold uppercase text-slate-400 mb-6 tracking-widest">Parameters</h2>
                         <div class="space-y-6">
-                            <div class="input-group">
-                                <label>Harga Properti (Exclude PPN)</label>
-                                <div class="relative">
-                                    <span class="absolute left-0 top-2 font-bold text-slate-400 text-lg">Rp</span>
-                                    <input type="number" id="basePrice" value="1000000000" oninput="calculate()" class="input-premium pl-8">
-                                </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-500 uppercase">Harga Properti (Exc. PPN)</label>
+                                <input type="number" id="basePrice" value="1000000000" oninput="calculate()" class="input-premium">
                             </div>
-
-                            <div class="grid grid-cols-2 gap-6">
-                                <div class="input-group">
-                                    <label>Booking Fee</label>
-                                    <input type="number" id="bookingFee" value="10000000" oninput="calculate()" class="input-premium">
-                                </div>
-                                <div class="input-group">
-                                    <label>Down Payment (%)</label>
-                                    <input type="number" id="dpPercent" value="10" oninput="calculate()" class="input-premium">
-                                </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="text-[10px] font-bold text-slate-500 uppercase">Booking Fee</label><input type="number" id="booking" value="10000000" oninput="calculate()" class="input-premium text-sm"></div>
+                                <div><label class="text-[10px] font-bold text-slate-500 uppercase">DP (%)</label><input type="number" id="dp" value="10" oninput="calculate()" class="input-premium text-sm"></div>
                             </div>
-
-                            <div class="grid grid-cols-2 gap-6">
-                                <div class="input-group">
-                                    <label>Tenor (1-30 Tahun)</label>
-                                    <input type="number" id="tenor" value="15" min="1" max="30" oninput="calculate()" class="input-premium">
-                                </div>
-                                <div class="input-group">
-                                    <label>Suku Bunga (% p.a)</label>
-                                    <input type="number" id="interest" step="0.1" value="5.5" oninput="calculate()" class="input-premium">
-                                </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="text-[10px] font-bold text-slate-500 uppercase">Tenor (Thn)</label><input type="number" id="tenor" value="15" oninput="calculate()" class="input-premium text-sm"></div>
+                                <div><label class="text-[10px] font-bold text-slate-500 uppercase">Bunga (%)</label><input type="number" id="rate" value="5.5" oninput="calculate()" class="input-premium text-sm"></div>
                             </div>
-
-                            <div class="input-group">
-                                <label>Biaya Akad (1% - 5%)</label>
-                                <input type="number" id="akadPercent" value="3" min="1" max="5" oninput="calculate()" class="input-premium">
-                            </div>
+                            <div><label class="text-[10px] font-bold text-slate-500 uppercase">Biaya Akad (%)</label><input type="number" id="akad" value="3" oninput="calculate()" class="input-premium text-sm"></div>
                         </div>
-                    </section>
+                    </div>
                 </div>
 
                 <div class="lg:col-span-7 space-y-6">
-                    <div class="luxury-gradient rounded-3xl p-10 text-white shadow-xl relative overflow-hidden">
-                        <div class="relative z-10">
-                            <p class="text-xs font-bold uppercase tracking-[0.2em] opacity-60 mb-2">Estimasi Angsuran / Bulan</p>
-                            <h3 id="monthlyInstallment" class="text-5xl md:text-6xl font-bold tracking-tight mb-8">Rp 0</h3>
-                            
-                            <div class="grid grid-cols-2 gap-4 border-t border-white/10 pt-6">
-                                <div>
-                                    <p class="text-[10px] uppercase opacity-50">Harga (Include PPN 11%)</p>
-                                    <p id="incPPN" class="text-lg font-semibold">Rp 0</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-[10px] uppercase opacity-50">Total Pinjaman (Plafon)</p>
-                                    <p id="plafon" class="text-lg font-semibold text-gold-accent">Rp 0</p>
-                                </div>
-                            </div>
+                    <div class="luxury-gradient rounded-3xl p-8 text-white shadow-xl">
+                        <p class="text-[10px] uppercase tracking-widest opacity-60 mb-2">Angsuran / Bulan</p>
+                        <h3 id="monthlyInstallment" class="text-5xl font-bold mb-6">Rp 0</h3>
+                        <div class="grid grid-cols-2 gap-4 border-t border-white/10 pt-4 text-sm">
+                            <div><p class="opacity-50 text-[10px] uppercase">Inc. PPN (11%)</p><p id="incPPN" class="font-semibold"></p></div>
+                            <div class="text-right"><p class="opacity-50 text-[10px] uppercase">Plafon KPR</p><p id="plafon" class="font-semibold text-yellow-500"></p></div>
                         </div>
-                        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-2xl card-shadow border-t-4 border-slate-900">
-                            <h4 class="text-xs font-bold uppercase text-slate-400 mb-4">Biaya Legal & Surat</h4>
-                            <div class="space-y-3 text-sm">
-                                <div class="flex justify-between border-b pb-2">
-                                    <span class="text-slate-500">AJB (0.5%)</span>
-                                    <span id="resAJB" class="font-bold text-slate-800">Rp 0</span>
-                                </div>
-                                <div class="flex justify-between border-b pb-2">
-                                    <span class="text-slate-500">BPHTB (5%)</span>
-                                    <span id="resBPHTB" class="font-bold text-slate-800">Rp 0</span>
-                                </div>
-                                <div class="flex justify-between pt-1">
-                                    <span class="font-bold">Total Biaya Surat</span>
-                                    <span id="totalSurat" class="font-bold text-slate-900">Rp 0</span>
-                                </div>
-                            </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white p-5 rounded-2xl card-shadow border-t-2 border-slate-800">
+                            <p class="text-[10px] uppercase font-bold text-slate-400 mb-2">Legal (AJB & BPHTB)</p>
+                            <p id="totalSurat" class="text-lg font-bold text-slate-800"></p>
                         </div>
-
-                        <div class="bg-white p-6 rounded-2xl card-shadow border-t-4 border-slate-900">
-                            <h4 class="text-xs font-bold uppercase text-slate-400 mb-4">Estimasi Akad KPR</h4>
-                            <div class="space-y-3 text-sm">
-                                <div class="flex justify-between border-b pb-2">
-                                    <span class="text-slate-500">Provisi, Admin, Asuransi</span>
-                                    <span id="resAkad" class="font-bold text-slate-800">Rp 0</span>
-                                </div>
-                                <p class="text-[10px] text-slate-400 italic">*Biaya bersifat estimasi sesuai kebijakan bank.</p>
-                            </div>
+                        <div class="bg-white p-5 rounded-2xl card-shadow border-t-2 border-slate-800">
+                            <p class="text-[10px] uppercase font-bold text-slate-400 mb-2">Est. Biaya Akad</p>
+                            <p id="resAkad" class="text-lg font-bold text-slate-800"></p>
                         </div>
                     </div>
 
                     <div class="bg-white rounded-3xl card-shadow overflow-hidden">
-                        <div class="p-6 border-b flex justify-between items-center">
-                            <h4 class="text-xs font-bold uppercase tracking-widest text-slate-400">Tabel Amortisasi Bank (Tahun ke-1)</h4>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm">
-                                <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider">
-                                    <tr>
-                                        <th class="px-6 py-4 font-bold">Bulan</th>
-                                        <th class="px-6 py-4 font-bold">Cicilan Pokok</th>
-                                        <th class="px-6 py-4 font-bold">Cicilan Bunga</th>
-                                        <th class="px-6 py-4 font-bold text-right">Sisa Pinjaman</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="amortizationTable" class="divide-y divide-slate-100"></tbody>
-                            </table>
-                        </div>
+                        <div class="bg-slate-50 p-4 border-b"><p class="text-[10px] font-bold uppercase text-slate-500">Amortisasi (Tahun 1)</p></div>
+                        <table class="w-full text-xs text-left">
+                            <tbody id="amortTable" class="divide-y"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -181,8 +108,7 @@
 
     <script>
         function checkAuth() {
-            const pass = document.getElementById('passInput').value;
-            if(pass === "RuangMasbay2026") {
+            if(document.getElementById('passInput').value === "RuangMasbay2026") {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
                 calculate();
@@ -191,69 +117,40 @@
             }
         }
 
-        // Trigger login on Enter key
-        document.getElementById('passInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') checkAuth();
-        });
-
         function formatIDR(val) {
-            return new Intl.NumberFormat('id-ID', { 
-                style: 'currency', 
-                currency: 'IDR', 
-                maximumFractionDigits: 0 
-            }).format(val);
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val);
         }
 
         function calculate() {
-            const basePrice = parseFloat(document.getElementById('basePrice').value) || 0;
-            const booking = parseFloat(document.getElementById('bookingFee').value) || 0;
-            const dpPct = parseFloat(document.getElementById('dpPercent').value) || 0;
-            const tenorYear = parseFloat(document.getElementById('tenor').value) || 0;
-            const rateYear = parseFloat(document.getElementById('interest').value) || 0;
-            const akadPct = parseFloat(document.getElementById('akadPercent').value) || 0;
+            const price = parseFloat(document.getElementById('basePrice').value) || 0;
+            const dpPct = parseFloat(document.getElementById('dp').value) || 0;
+            const incPPN = price * 1.11;
+            const plafon = incPPN - (incPPN * dpPct/100);
+            const r = (parseFloat(document.getElementById('rate').value) / 100) / 12;
+            const n = (parseFloat(document.getElementById('tenor').value) || 0) * 12;
 
-            const priceIncPPN = basePrice * 1.11;
-            const totalDPRequired = (priceIncPPN * (dpPct/100));
-            const plafon = priceIncPPN - totalDPRequired;
-            const ajb = basePrice * 0.005;
-            const bphtb = basePrice * 0.05;
-            const akadCost = plafon * (akadPct/100);
+            let monthly = r > 0 ? plafon * (r * Math.pow(1+r, n)) / (Math.pow(1+r, n) - 1) : plafon/n;
 
-            const r = (rateYear / 100) / 12;
-            const n = tenorYear * 12;
-            let monthly = 0;
-            if (r > 0) {
-                monthly = plafon * (r * Math.pow(1+r, n)) / (Math.pow(1+r, n) - 1);
-            } else {
-                monthly = n > 0 ? plafon / n : 0;
-            }
-
-            document.getElementById('incPPN').innerText = formatIDR(priceIncPPN);
+            document.getElementById('incPPN').innerText = formatIDR(incPPN);
             document.getElementById('monthlyInstallment').innerText = formatIDR(monthly);
             document.getElementById('plafon').innerText = formatIDR(plafon);
-            document.getElementById('resAJB').innerText = formatIDR(ajb);
-            document.getElementById('resBPHTB').innerText = formatIDR(bphtb);
-            document.getElementById('totalSurat').innerText = formatIDR(ajb + bphtb);
-            document.getElementById('resAkad').innerText = formatIDR(akadCost);
+            document.getElementById('totalSurat').innerText = formatIDR(price * 0.055);
+            document.getElementById('resAkad').innerText = formatIDR(plafon * (document.getElementById('akad').value/100));
 
             let tableHTML = "";
-            let currentBalance = plafon;
-            for(let i = 1; i <= Math.min(n, 12); i++) {
-                let interestPayment = currentBalance * r;
-                let principalPayment = monthly - interestPayment;
-                currentBalance -= principalPayment;
-                
-                tableHTML += `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="px-6 py-4 font-bold text-slate-400">${i}</td>
-                        <td class="px-6 py-4 text-slate-700">${formatIDR(principalPayment)}</td>
-                        <td class="px-6 py-4 text-slate-700">${formatIDR(interestPayment)}</td>
-                        <td class="px-6 py-4 text-right font-semibold text-slate-900">${formatIDR(Math.max(0, currentBalance))}</td>
-                    </tr>
-                `;
+            let balance = plafon;
+            for(let i=1; i<=12; i++) {
+                let bunga = balance * r;
+                let pokok = monthly - bunga;
+                balance -= pokok;
+                tableHTML += `<tr class="p-4"><td class="p-3 font-bold text-slate-400">${i}</td><td class="p-3 text-slate-600">Pokok: ${formatIDR(pokok)}</td><td class="p-3 text-right font-semibold">${formatIDR(Math.max(0, balance))}</td></tr>`;
             }
-            document.getElementById('amortizationTable').innerHTML = tableHTML;
+            document.getElementById('amortTable').innerHTML = tableHTML;
         }
     </script>
 </body>
 </html>
+"""
+
+# Menampilkan kode HTML ke dalam aplikasi Streamlit
+components.html(html_content, height=1500, scrolling=True)
